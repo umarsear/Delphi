@@ -19,6 +19,7 @@ type
     sectors      : array of tDonoughtSector;
     fthickness   : integer;
     fPieSize        : integer;
+    fimageSize   : integer;
     ftotal       : single;
     sectorCount  : byte;
     parent       : tFmxObject;
@@ -27,11 +28,13 @@ type
     procedure updatePieDisplay;
     procedure setThickness(aValue:integer);
     procedure setSize(aValue:integer);
+    procedure setImageCircleSize(aValue:integer);
     procedure setImage(anImage:tGlyph);
   public
-    property thickness     : integer  read fthickness write setThickness;
-    property pieSize       : integer  read fPieSize   write setSize;
-    property image         : tGlyph   write setimage;
+    property thickness        : integer  read fthickness write setThickness;
+    property pieSize          : integer  read fPieSize   write setSize;
+    property image            : tGlyph   write setimage;
+    property imageCircleSize  : integer  read fimagesize write setImageCircleSize;
     constructor create(aOwner:TComponent);
     procedure addSector(color : tColor; sectorValue:single);
     procedure updateSector(aSectorNumber:byte;newValue:single);
@@ -55,18 +58,17 @@ var  i       : integer;
      lastPos : single;
      pieUnit : single;
 begin
-
   innerCircle.BringToFront;
   imageCircle.BringToFront;
-  (* if an image has been assigned bring it to front*)
   if fimage<>nil then
     fimage.BringToFront;
 
-  (* set thicknes for inner circle *)
   innerCircle.Width:=fPieSize-fThickness;
   innerCircle.Height:=fPieSize-fThickness;
 
-  (* Calculate and draw the circles *)
+  imageCircle.Height:=fImageSize;
+  imageCircle.Width:=fImageSize;
+
   if sectorCount>0 then
   begin
     pieUnit:=360/fTotal;
@@ -87,7 +89,6 @@ begin
   end;
 end;
 
-
 (* set Pie thickness *)
 procedure tDoughnutPie.setThickness(aValue: Integer);
 begin
@@ -99,6 +100,13 @@ end;
 procedure tDoughnutPie.setSize(aValue: Integer);
 begin
   fPieSize:=aValue;
+  updatePieDisplay;
+end;
+
+(* Set size of central image circle *)
+procedure tDoughnutPie.setImageCircleSize(aValue: Integer);
+begin
+  fImageSize:=aValue;
   updatePieDisplay;
 end;
 
@@ -123,7 +131,6 @@ begin
   end;
 end;
 
-
 (* add a pie section *)
 procedure tDoughnutPie.addSector(color: TColor; sectorValue: single);
 var aRadiantSector : tRadiantSector;
@@ -146,7 +153,6 @@ begin
   updatePieDisplay;
 end;
 
-
 (* Create and initialize a doughnut Pie*)
 constructor tDoughnutPie.create(aOwner: TComponent);
 begin
@@ -155,6 +161,7 @@ begin
   ftotal:=0;
   fPieSize:=350;
   fThickness:=100;
+  fImageSize:=160;
   owner:=aOwner;
   parent:=tFmxObject(owner);
 
@@ -168,6 +175,9 @@ begin
   imageCircle:=tRadiantCircle.Create(owner);
   imageCircle.Parent:=parent;
   imageCircle.Align:=TAlignLayout.Center;
+
+  imageCircle.Height:=fImageSize;
+  imageCircle.Width:=fImageSize;
   updatePieDisplay;
 end;
 
